@@ -1,19 +1,19 @@
 #!/usr/bin/python3
 """
-TopFrame.py: 
+CtrFra.py: 
   Description 
 
 """
 ######################################################################
 # Pypi Import
 #
-import typing, copy 
+import typing, copy
 import configparser as cf
-from tkinter import Frame
 
 ######################################################################
 # Local Import
 #
+import TopFrame as tf
 
 __author__    = "David A Hall "
 __copyright__ = """Copyright 2025, David A Hall
@@ -21,17 +21,13 @@ __copyright__ = """Copyright 2025, David A Hall
                    Licence GPL 3.0 see LICENCE.md
 """
 
-class TopFrame(Frame):
+class CtrFra(tf.TopFrame):
     """
     """
     def __init__(self, *args, **kwargs):
         Loc_kwargs = copy.copy(kwargs)
-        self.config = Loc_kwargs.pop("config")
         super().__init__(*args, **Loc_kwargs)
-        self.bg = self.config.get("COLOURS","Background")
-        self.height = self.config.getint("ROOT","Height")
-        self.width  = self.config.getint("ROOT","Width")
-        self.configure(background=self.bg, height=self.height, width=self.width)
+        self.build_buts()
         
         
         

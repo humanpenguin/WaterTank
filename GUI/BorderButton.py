@@ -21,10 +21,21 @@ __copyright__ = """Copyright 2025, David A Hall
                    Licence GPL 3.0 see LICENCE.md
 """
 
-class BButton(Frame):
+class BButton( Frame):
     """
     """
     def __init__(self, *args, **kwargs):
-        self.config = kwargs.pop("config")
-        super().__init__(*args, **kwargs)
-        self.xpad
+        #try:
+            self.config = kwargs.pop("config")
+            flpad = self.config.getint("BUTTON","Padd")
+            bg_col= str(self.config.get("COLOURS","Background"))
+            fg_col= str(self.config.get("COLOURS","Foreground"))
+            bd_col= str(self.config.get("COLOURS","ButtBorder"))
+
+            super().__init__(*args, **kwargs)
+            self.configure( padx=flpad, pady=flpad, background=bd_col)
+            self.button = Button(self, **kwargs)
+            self.button.configure( background=bg_col)
+            
+        #except Exception as e:
+        #    print(f"An error occurred: {e}")

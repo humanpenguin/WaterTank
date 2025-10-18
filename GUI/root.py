@@ -7,9 +7,9 @@ root.py:
 ######################################################################
 # Pypi Import
 #
-import typing
+import copy, typing
 import configparser as cf
-from tkinter import Tk
+from tkinter import Tk, PhotoImage
 
 ######################################################################
 # Local Import
@@ -26,12 +26,19 @@ class RootWindow(Tk):
     """
     """
     def __init__(self, *args, **kwargs):
-        self.config = kwargs.pop("config")
-        super().__init__(*args, **kwargs)
-        self.height = self.config.getint('ROOT','Height')
-        self.width  = self.config.getint('ROOT','Width')
+        loc_kwargs = copy.copy(kwargs)
+        self.config = loc_kwargs.pop("config")
+        super().__init__(*args, **loc_kwargs)
+        icfp   = PhotoImage(self.config.get("PATHS","IconPath")+"/"+
+                            self.config.get("ICONS","Window"))
+        height = self.config.getint('ROOT','Height')
+        width  = self.config.getint('ROOT','Width')
+        xpos   = self.config.getint('ROOT','Xpos')
+        ypos   = self.config.getint('ROOT','Ypos')
+        self.geometry(str(width)+"x"+str(height)+
+                      "+"+str(xpos)+"+"+str(ypos))
+        self.title(self.config.get('ROOT','Tittle'))
+        self.resizable(False, False)
+        self.iconphoto(True, icfp)
         
         
-        
-        
-    
