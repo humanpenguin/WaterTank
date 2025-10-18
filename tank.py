@@ -8,13 +8,14 @@ tank.py:
 # Pypi Import
 #
 import configparser
+import tkinter as tk
 from tkinter import Tk, font
 
 ######################################################################
 # Local Import
 #
 import GUI.root as rt
-import GUI.TopFrame as tf
+import GUI.CtrFra as cf
 
 __author__    = "David A Hall "
 __copyright__ = """Copyright 2025, David A Hall
@@ -23,15 +24,15 @@ __copyright__ = """Copyright 2025, David A Hall
 """
 
 def main( **args):
+    fp = open("/home/dave/Software/Development/WaterTank/Data/config.ini",'r')
     config = configparser.ConfigParser()
-    config.read("/home/dave/Software/Development/WaterTank/Data/config.ini")
+    config.read_file(fp)
     
     root      = rt.RootWindow(config=config)
-    top_frame = tf.TopFrame(root, config=config)
-    top_frame.pack()
+    ctr_frame = cf.CtrFra(root, config=config)
+    ctr_frame.place(x=0,y=0)
     root.mainloop()
     
-    
-
 if __name__ == "__main__":
     main()
+
