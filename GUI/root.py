@@ -26,7 +26,7 @@ class RootWindow(Tk):
     """
     """
     def __init__(self, *args, **kwargs):
-        loc_kwargs = copy.copy(kwargs)
+        loc_kwargs = copy.deepcopy(kwargs)
         self.config = loc_kwargs.pop("config")
         super().__init__(*args, **loc_kwargs)
         icfp   = PhotoImage(self.config.get("PATHS","IconPath")+"/"+

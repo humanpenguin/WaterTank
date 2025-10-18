@@ -7,7 +7,7 @@ TopFrame.py:
 ######################################################################
 # Pypi Import
 #
-import typing, copy 
+import copy 
 import configparser as cf
 from tkinter import Frame
 
@@ -25,15 +25,20 @@ class TopFrame(Frame):
     """
     """
     def __init__(self, *args, **kwargs):
-        Loc_kwargs = copy.copy(kwargs)
-        self.config = Loc_kwargs.pop("config")
-        super().__init__(*args, **Loc_kwargs)
+        self.args = copy.deepcopy(kwargs)
+        self.config = self.args.pop("config")
+        super().__init__(*args, **self.args)
         self.bg = self.config.get("COLOURS","Background")
         self.height = self.config.getint("ROOT","Height")
         self.width  = self.config.getint("ROOT","Width")
         self.configure(background=self.bg, height=self.height, width=self.width)
         
         
-        
-        
-    
+    def getroot(self) -> object:
+        try:
+            root = self
+            while self.master:
+                root = self.master
+            return root
+        except Exception as e:
+            print(f"An error occurred: {e}")

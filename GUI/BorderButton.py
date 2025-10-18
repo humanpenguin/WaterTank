@@ -7,7 +7,7 @@ BorderButton.py:
 ######################################################################
 # Pypi Import
 #
-import typing
+import typing, copy
 import configparser as cf
 from tkinter import Frame, Button
 
