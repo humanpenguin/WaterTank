@@ -1,5 +1,6 @@
-#!/usr/bin/python3
+#!/home/dave/Software/Development/WaterTank/bin/python3
 """
+/usr/bin/python3
 CtrFra.py: 
   Description 
 
@@ -32,7 +33,7 @@ class CtrFra(tf.TopFrame):
         
         super().__init__(*args, **kwargs)
         self.build_buts()
-        self.build_layout()
+#        self.build_layout()
         
         
     def build_buts( self):
