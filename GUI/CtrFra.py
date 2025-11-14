@@ -7,8 +7,7 @@ CtrFra.py:
 """
 ######################################################################
 # Pypi Import
-#
-import typing, copy, pprint
+import typing, copy
 import configparser as cf
 import tkinter as tk
 
@@ -17,6 +16,7 @@ import tkinter as tk
 #
 import GUI.TopFrame as tf
 import GUI.BorderButton as bb
+import GPIO.Heaters as hh
 
 __author__    = "David A Hall "
 __copyright__ = """Copyright 2025, David A Hall
@@ -32,6 +32,7 @@ class CtrFra(tf.TopFrame):
         self.config = copy.deepcopy(kwargs['config'])
         
         super().__init__(*args, **kwargs)
+        self.heat = hh.Heaters(config=self.config)
         self.build_buts()
         self.build_layout()
         
@@ -43,14 +44,26 @@ class CtrFra(tf.TopFrame):
         self.SolD_Butt = bb.BButton(self, config=self.config, width=5, text="Solar")
         self.Moor_Butt = bb.BButton(self, config=self.config, width=5, text="Moor")
     
-    def build_layout( self):
+    def build_layout( self) -> None:
         self.Close_Butt.place(x=680, y=360)
+        self.Close_Butt.event_manager("Close", "Shut down Water Tank System",
+                                      self.close)
         self.Main_Butt.place(x=1, y=0)
+        self.Main_Butt.event_manager("A.C. Heater",
+                                     "Manage the A.C. Water Heating System Settings",
+                                     self.close)
         self.Batt_Butt.place(x=1, y=120)
+        self.Batt_Butt.event_manager("Battery Heater",
+                                     "Manage the Battery Water Heating System Settings",
+                                     self.close)
         self.SolD_Butt.place(x=1, y=240)
+        self.SolD_Butt.event_manager("Solar Dump",
+                                     "Manage the Solar Dump Water Heating System Settings",
+                                     self.close)
         self.Moor_Butt.place(x=1, y=360)
-
-    
+        self.Moor_Butt.event_manager("",
+                                     "Manage the Longterm Mooring Water Moniter Settings",
+                                     self.close)
 
     def close( self):
         self.winfo_toplevel().destroy()

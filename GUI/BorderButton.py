@@ -8,7 +8,7 @@ BorderButton.py:
 ######################################################################
 # Pypi Import
 #
-import typing, copy, time
+import typing, copy, time, subprocess
 import configparser as cf
 from tkinter import Frame, Button, font as tkFont, PhotoImage, GROOVE, RAISED
 
@@ -26,6 +26,7 @@ __copyright__ = """Copyright 2025, David A Hall
 class BButton(Frame):
     """
     """
+    bord_flash: tuple[str, str]
 
     def __init__(self, *args, **kwargs):
         """
@@ -53,11 +54,6 @@ class BButton(Frame):
         :type kwargs: object
         """
         try:
-            self.handlers = {'event'     : None,
-                             'flash'     : False,
-                             'press_time': 0,
-                             'short_help': " ",
-                             'long_help' : """ """}
             self.framedict = dict()
             self.buttondict = dict()
             keys = kwargs.copy()
@@ -85,66 +81,79 @@ class BButton(Frame):
             self.buttondict["background"] = str(self.config.get("COLOURS", "Background"))
             self.buttondict["foreground"] = str(self.config.get("COLOURS", "Foreground"))
             self.buttondict["highlightbackground"] = str(self.config.get("COLOURS", "Background"))
-            self.bord_flash = (str(self.config.get("COLOURS","FlashBordB")),
-                               str(self.config.get("COLOURS","ButtBorder")))
+            self.bord_flash = (str(self.config.get("COLOURS","ButtBorder")),
+                               str(self.config.get("COLOURS","FlashBordB")))
             return kwargs
         except Exception as e:
             print(f"An error occurred in BButton.build_self: {e}")
 
-    def event_manager(self, s_help, l_help, *func: object):
+    def event_manager(self, s_help, l_help, func: object):
         """
 
         :param l_help:
-        :param *func:
+        :param func:
         :type s_help: String
         """
         try:
-            self.handlers['event'] = func
-            self.handlers['flash'] = False
-            self.handlers['press_time'] = time.time()
-            self.handlers['short_help'] = s_help
-            self.handlers['long_help'] = l_help
+            self.handler = self.Hand(s_help, l_help, func)
+            self.handler.flash = False
             self.button.bind("<ButtonPress>", self.but_press)
             self.button.bind("<ButtonRelease>", self.but_release)
         except Exception as e:
             print(f"An error occurred in BButton.event_manager: {e}")
 
-    def flash_butt(self, index=0):
+    def flash_butt(self, index=False):
         try:
-            if self.handlers['flash']:
-                index = 1 - index
-                self.configure(background=self.bord_flash[index])
+            if self.handler.flash:
+                if index: flacol = self.bord_flash[1]
+                else: flacol = self.bord_flash[0]
+                self.configure(background=flacol)
                 self.after(self.config.getint("BUTTON","FlaTime"),
-                           lambda: self.flash_butt(1 - index) )
+                           lambda: self.flash_butt(not index))
             else:
                 self.configure(background=self.bord_flash[0])
         except Exception as e:
             print(f"An error occurred in BButton.flash_butt: {e}")
 
-    def but_press(self):
+    def but_press(self, e):
         """ """
         try:
-            self.handlers['press_time'] = time.time()
-            self.handlers['flash'] = True
+            self.handler.set_time()
+            self.handler.switch_flash()
             self.flash_butt()
         except Exception as e:
             print(f"An error occurred in BButton.but_press: {e}")
 
-    def but_release(self):
+    def but_release(self, e):
         """ """
         try:
-            self.after(600, self.flash_off)
-            pressed = time.time() - self.handlers['press_time']
-            if pressed <= 500:
-                lambda :self.handlers['event']
-            elif pressed <= 2000:
-                print(self.handlers["short_help"])
+            self.after(600, self.handler.switch_flash())
+            pressed = time.time() - self.handler.press_time
+            if pressed <= (self.config.getint("BUTTON","ShortPress")/1000):
+                self.handler.event()
+            elif pressed <= (self.config.getint("BUTTON","LongPress")/1000):
+                self.espeak(self.handler.short_help)
             else:
-                print(self.handlers["long_help"])
+                self.espeak(self.handler.long_help)
         except Exception as e:
             print(f"An error occurred in BButton.but_release: {e}")
 
-    def flash_off(self):
-        """ """
-        self.handlers['flash'] = False
+    def espeak(self, text: str) :
+        """ Use espeak to convert text to speech. """
+        subprocess.run(['espeak','-k20','-p40', '-m' ,'<break> '+text])
 
+    class Hand():
+        event: object
+
+        def __init__(self, s_help = "", l_help = """""", func = None):
+            self.event      = func
+            self.flash      = False
+            self.press_time = 0
+            self.short_help = s_help
+            self.long_help  = l_help
+
+        def switch_flash(self):
+            self.flash = not self.flash
+
+        def set_time(self):
+            self.press_time = time.time()
